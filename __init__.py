@@ -44,14 +44,24 @@ urllib2.install_opener(opener)
 
 class DiffFetcher:
     def __init__(self, save_state=False):
-        pass
-
-    def init_from_state(self, statefile=None):
-        '''
-        Initalizes from a statefile on disk
-        '''
-        pass
+        self._statef = None
         
+        
+    def init_state(self):
+        '''
+        Initalizes with a statefile on disk
+        '''
+        self._statef = open('state.txt', 'rw+')
+
+        self._process_statefile(self._statef.read())
+        
+    def save_state(self):
+        '''
+        Saves the current statefile to disk
+        '''
+        if self._statef:
+            pass
+    
     def init_latest(self):
         url = REPLICATE_BASE + 'state.txt'
         statefile = urllib2.urlopen(url)
@@ -79,7 +89,7 @@ class DiffFetcher:
         Returns the next diff from the server even if it has to wait.
         '''
         result = self.next()
-        while not result
+        while not result:
             time.sleep(60.0)
             result = self.next()
         
