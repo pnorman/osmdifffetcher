@@ -78,6 +78,12 @@ class DiffFetcher:
         '''
         Returns the next diff from the server even if it has to wait.
         '''
+        result = self.next()
+        while not result
+            time.sleep(60.0)
+            result = self.next()
+        
+        return result
 
     def next(self):
         '''
