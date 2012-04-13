@@ -23,3 +23,74 @@ from datetime import datetime
 import time
 import os
 import errno
+import gzip
+import StringIO
+
+REPLICATE_BASE = 'http://planet.openstreetmap.org/redaction-period/minute-replicate/'
+
+try:
+    config = __import__('config.py')
+    try:
+        if config.REPLICATE_BASE:
+            REPLICATE_BASE = config.REPLICATE_BASE
+    except:
+        pass
+except:
+    pass
+    
+opener = urllib2.build_opener()
+opener.addheaders = [('User-Agent', 'OSMDiffFetcher/0.1.0')]
+urllib2.install_opener(opener)
+
+class DiffFetcher:
+    def __init__(self, save_state=False):
+        pass
+
+    def init_from_state(self, statefile=None):
+        '''
+        Initalizes from a statefile on disk
+        '''
+        pass
+        
+    def init_latest(self):
+        url = REPLICATE_BASE + 'state.txt'
+        statefile = urllib2.urlopen(url)
+        self._process_statefile(statefile)
+        
+    def _process_statefile(self, statefile):
+        state = {}
+        for line in statefile:
+            if line[0] == '#':
+                continue
+            k, v = line.split('=', 1)
+            state[k] = v.replace('\\:',':').strip()
+        self.sequence = int(state['sequenceNumber']) # The sequence number of the next to fetch
+    
+    @property
+    def sequence_path(self):
+        '''
+        Returns the sequence number as a path (e.g. 123/456/789)
+        '''
+        sequence_string = str(int(self.sequence)).zfill(9)
+        return sequence_string[0:3] + '/' + sequence_string[3:6] + '/' + sequence_string[6:9]
+        
+    def next_wait(self):
+        '''
+        Returns the next diff from the server even if it has to wait.
+        '''
+
+    def next(self):
+        '''
+        Returns the next diff from the server or none if up to date
+        '''
+        url = REPLICATE_BASE + self.sequence_path + '.osc.gz'
+        try:
+            compressed = urllib2.urlopen(url)
+        except urllib2.HTTPError, e:
+            if e.code == 404:
+                return None
+            else:
+                raise e
+        self.sequence += 1
+        
+        return gzip.GzipFile(fileobj=StringIO.StringIO(compressed.read))
