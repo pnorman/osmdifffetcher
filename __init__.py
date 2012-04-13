@@ -109,4 +109,4 @@ class DiffFetcher:
                 raise e
         self.sequence += 1
         
-        return gzip.GzipFile(fileobj=StringIO.StringIO(compressed.read))
+        return gzip.GzipFile(fileobj=StringIO.StringIO(compressed.read()))
