@@ -26,7 +26,7 @@ import errno
 import gzip
 import StringIO
 
-REPLICATE_BASE = 'http://planet.openstreetmap.org/redaction-period/minute-replicate/'
+REPLICATE_BASE = 'http://planet.openstreetmap.org/replication/minute/'
 
 try:
     config = __import__('config.py')
